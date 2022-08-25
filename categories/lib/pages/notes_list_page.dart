@@ -14,7 +14,8 @@ class NotesListArguments {
 }
 
 class NotesList extends StatefulWidget {
-  const NotesList({Key? key}) : super(key: key);
+  const NotesList({Key? key, required this.category}) : super(key: key);
+  final Category category;
 
   @override
   State<StatefulWidget> createState() => NotesListState();
@@ -35,9 +36,7 @@ class NotesListState extends State<NotesList> {
   @override
   void didChangeDependencies() {
     setState(() {
-      _category =
-          (ModalRoute.of(context)!.settings.arguments as NotesListArguments)
-              .category;
+      _category = widget.category;
     });
     super.didChangeDependencies();
   }

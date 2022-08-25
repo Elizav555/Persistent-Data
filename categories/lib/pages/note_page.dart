@@ -9,7 +9,8 @@ class NotePageArguments {
 }
 
 class NotePage extends StatefulWidget {
-  const NotePage({Key? key}) : super(key: key);
+  const NotePage({Key? key, required this.note}) : super(key: key);
+  final Note note;
 
   @override
   State<StatefulWidget> createState() => NotePageState();
@@ -21,8 +22,7 @@ class NotePageState extends State<NotePage> {
   @override
   void didChangeDependencies() {
     setState(() {
-      _note = (ModalRoute.of(context)!.settings.arguments as NotePageArguments)
-          .note;
+      _note = widget.note;
     });
     super.didChangeDependencies();
   }

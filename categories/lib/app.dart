@@ -15,12 +15,45 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: Routes.categoriesList,
-      routes: {
-        Routes.categoriesList: (context) =>
-            const CategoriesList(title: 'Categories List'),
-        Routes.notesList: (context) => const NotesList(),
-        Routes.note: (context) => const NotePage(),
+      home: const CategoriesList(title: 'Categories List'),
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case Routes.categoriesList:
+            {
+              return MaterialPageRoute(
+                builder: (context) {
+                  return const CategoriesList(title: 'Categories List');
+                },
+              );
+            }
+          case Routes.notesList:
+            {
+              final args = settings.arguments as NotesListArguments;
+              return MaterialPageRoute(
+                builder: (context) {
+                  return NotesList(
+                    category: args.category,
+                  );
+                },
+              );
+            }
+          case Routes.note:
+            {
+              final args = settings.arguments as NotePageArguments;
+              return MaterialPageRoute(
+                builder: (context) {
+                  return NotePage(
+                    note: args.note,
+                  );
+                },
+              );
+            }
+          default:
+            {
+              assert(false, 'Need to implement ${settings.name}');
+              return null;
+            }
+        }
       },
     );
   }
