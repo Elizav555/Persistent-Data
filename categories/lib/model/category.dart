@@ -1,17 +1,17 @@
 import 'package:hive/hive.dart';
 
+import 'note.dart';
+
 part 'category.g.dart';
 
 @HiveType(typeId: 1)
-enum Category {
+class Category extends HiveObject {
   @HiveField(0)
-  music,
+  int id;
   @HiveField(1)
-  films,
+  String name;
   @HiveField(2)
-  games,
-  @HiveField(3)
-  books,
-  @HiveField(4, defaultValue: true)
-  common
+  List<Note> notes;
+
+  Category(this.id, this.name, this.notes);
 }

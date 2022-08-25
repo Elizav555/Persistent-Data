@@ -12,41 +12,27 @@ class CategoryAdapter extends TypeAdapter<Category> {
 
   @override
   Category read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return Category.music;
-      case 1:
-        return Category.films;
-      case 2:
-        return Category.games;
-      case 3:
-        return Category.books;
-      case 4:
-        return Category.common;
-      default:
-        return Category.common;
-    }
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Category(
+      fields[0] as int,
+      fields[1] as String,
+      (fields[2] as List).cast<Note>(),
+    );
   }
 
   @override
   void write(BinaryWriter writer, Category obj) {
-    switch (obj) {
-      case Category.music:
-        writer.writeByte(0);
-        break;
-      case Category.films:
-        writer.writeByte(1);
-        break;
-      case Category.games:
-        writer.writeByte(2);
-        break;
-      case Category.books:
-        writer.writeByte(3);
-        break;
-      case Category.common:
-        writer.writeByte(4);
-        break;
-    }
+    writer
+      ..writeByte(3)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.notes);
   }
 
   @override
