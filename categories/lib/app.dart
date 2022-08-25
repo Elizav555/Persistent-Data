@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       routes: {
         Routes.categoriesList: (context) =>
             const CategoriesList(title: 'Categories List'),
-        Routes.notesList: (context) => const NotesList(title: 'Notes List'),
+        Routes.notesList: (context) => const NotesList(),
         Routes.note: (context) => const NotePage(),
       },
     );

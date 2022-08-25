@@ -1,1 +1,1 @@
-enum DefaultCategories { music, films, games, books }
+enum DefaultCategories { Music, Films, Games, Books }

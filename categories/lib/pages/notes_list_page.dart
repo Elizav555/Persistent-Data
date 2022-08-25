@@ -4,6 +4,8 @@ import 'package:hive_flutter/adapters.dart';
 import '../main.dart';
 import '../model/category.dart';
 import '../model/note.dart';
+import '../utils/routes.dart';
+import 'note_page.dart';
 
 class NotesListArguments {
   final Category category;
@@ -12,8 +14,7 @@ class NotesListArguments {
 }
 
 class NotesList extends StatefulWidget {
-  const NotesList({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const NotesList({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => NotesListState();
@@ -45,7 +46,7 @@ class NotesListState extends State<NotesList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(_category.name),
       ),
       body: _category.notes.isEmpty
           ? const Center(
@@ -66,6 +67,8 @@ class NotesListState extends State<NotesList> {
                     },
                     icon: const Icon(Icons.delete),
                   ),
+                  onTap: () => Navigator.of(context).pushNamed(Routes.note,
+                      arguments: NotePageArguments(note)),
                 );
               },
               itemCount: _category.notes.length),
