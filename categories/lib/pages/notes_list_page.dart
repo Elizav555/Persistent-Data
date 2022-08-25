@@ -6,9 +6,9 @@ import '../model/category.dart';
 import '../model/note.dart';
 
 class NotesListArguments {
-  final int categoryId;
+  final Category category;
 
-  NotesListArguments(this.categoryId);
+  NotesListArguments(this.category);
 }
 
 class NotesList extends StatefulWidget {
@@ -22,48 +22,53 @@ class NotesList extends StatefulWidget {
 class NotesListState extends State<NotesList> {
   final _inputTitleController = TextEditingController();
   final _inputTextController = TextEditingController();
-  late Box<Category> _categoriesBox;
+  late Box<Note> _notesBox;
+  late Category _category;
 
   @override
   void initState() {
-    _categoriesBox = Hive.box<Category>(categories);
+    _notesBox = Hive.box<Note>(notes);
     super.initState();
   }
 
   @override
+  void didChangeDependencies() {
+    setState(() {
+      _category =
+          (ModalRoute.of(context)!.settings.arguments as NotesListArguments)
+              .category;
+    });
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as NotesListArguments;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: ValueListenableBuilder<Box<Category>>(
-        valueListenable: _categoriesBox.listenable(),
-        builder: (context, Box<Category> box, _) {
-          final notesList = box.get(args.categoryId)?.notes;
-          if (notesList == null || notesList.isEmpty) {
-            return const Center(
+      body: _category.notes.isEmpty
+          ? const Center(
               child: Text("Notes list is empty"),
-            );
-          }
-          return ListView.builder(
+            )
+          : ListView.builder(
               itemBuilder: (context, index) {
-                final note = notesList.elementAt(index);
+                final note = _category.notes.elementAt(index);
                 return ListTile(
                   key: UniqueKey(),
                   title: Text(note.title),
                   trailing: IconButton(
-                    onPressed: () {
-                      _categoriesBox.get(args.categoryId)?.notes.remove(note);
+                    onPressed: () async {
+                      await note.delete();
+                      setState(() {
+                        _category;
+                      });
                     },
                     icon: const Icon(Icons.delete),
                   ),
                 );
               },
-              itemCount: notesList.length);
-        },
-      ),
+              itemCount: _category.notes.length),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Widget cancelButton = TextButton(
@@ -73,8 +78,14 @@ class NotesListState extends State<NotesList> {
           Widget continueButton = TextButton(
               child: const Text("Add"),
               onPressed: () {
-                _categoriesBox.get(args.categoryId)?.notes.add(Note(
-                    _inputTitleController.text, _inputTextController.text));
+                final note =
+                    Note(_inputTitleController.text, _inputTextController.text);
+                _notesBox.add(note);
+                _category.notes.add(note);
+                _category.save();
+                setState(() {
+                  _category;
+                });
                 Navigator.pop(context, 'Add');
               });
           await showDialog<String>(
@@ -102,7 +113,7 @@ class NotesListState extends State<NotesList> {
             ),
           );
         },
-        tooltip: 'Add category',
+        tooltip: 'Add note',
         child: const Icon(Icons.add),
       ),
     );

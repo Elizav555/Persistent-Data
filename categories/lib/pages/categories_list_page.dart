@@ -19,31 +19,37 @@ class CategoriesList extends StatefulWidget {
 class _CategoriesListState extends State<CategoriesList> {
   final _inputController = TextEditingController();
   late Box<Category> _categoriesBox;
+  late Box<Note> _notesBox;
 
   @override
   void initState() {
     _categoriesBox = Hive.box<Category>(categories);
-    _initBox();
+    _notesBox = Hive.box<Note>(notes);
+    _initBoxes();
     super.initState();
   }
 
-  void _initBox() {
+  void _initBoxes() {
     for (var cat in DefaultCategories.values) {
       final notesList = List.generate(
           5,
           (index) =>
               Note('Name of ${cat.name} $index', 'Text of ${cat.name} $index'));
-      _categoriesBox.put(cat.index, Category(cat.index, cat.name, notesList));
+      _notesBox.addAll(notesList);
+      _categoriesBox.put(
+          cat.index,
+          Category(
+              cat.index, cat.name, HiveList(_notesBox, objects: notesList)));
     }
   }
 
   Future<void> _addCategory(String name) async {
     final key = _categoriesBox.length;
-    await _categoriesBox.put(key, Category(key, name, []));
+    await _categoriesBox.put(key, Category(key, name, HiveList(_notesBox)));
   }
 
-  Future<void> _deleteCategory(int key) async {
-    await _categoriesBox.delete(key);
+  Future<void> _deleteCategory(Category category) async {
+    await category.delete();
   }
 
   @override
@@ -71,12 +77,12 @@ class _CategoriesListState extends State<CategoriesList> {
                   title: Text(cat.name),
                   trailing: IconButton(
                     onPressed: () async {
-                      await _deleteCategory(cat.id);
+                      await _deleteCategory(cat);
                     },
                     icon: const Icon(Icons.delete),
                   ),
                   onTap: () => Navigator.of(context).pushNamed(Routes.notesList,
-                      arguments: NotesListArguments(cat.id)),
+                      arguments: NotesListArguments(cat)),
                 );
               },
               itemCount: box.values.length);

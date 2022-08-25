@@ -19,7 +19,7 @@ class CategoryAdapter extends TypeAdapter<Category> {
     return Category(
       fields[0] as int,
       fields[1] as String,
-      (fields[2] as List).cast<Note>(),
+      (fields[2] as HiveList).castHiveList(),
     );
   }
 
