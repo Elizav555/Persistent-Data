@@ -5,6 +5,8 @@ import '../main.dart';
 import '../model/category.dart';
 import '../model/default_categories.dart';
 import '../model/note.dart';
+import '../utils/routes.dart';
+import 'notes_list_page.dart';
 
 class CategoriesList extends StatefulWidget {
   const CategoriesList({Key? key, required this.title}) : super(key: key);
@@ -73,6 +75,8 @@ class _CategoriesListState extends State<CategoriesList> {
                     },
                     icon: const Icon(Icons.delete),
                   ),
+                  onTap: () => Navigator.of(context).pushNamed(Routes.notesList,
+                      arguments: NotesListArguments(cat.id)),
                 );
               },
               itemCount: box.values.length);
@@ -94,7 +98,10 @@ class _CategoriesListState extends State<CategoriesList> {
             context: context,
             builder: (BuildContext context) => AlertDialog(
               title: const Text('Add New Category'),
-              content: TextField(controller: _inputController),
+              content: TextField(
+                controller: _inputController,
+                decoration: const InputDecoration(label: Text('Category Name')),
+              ),
               actions: <Widget>[
                 cancelButton,
                 continueButton,
