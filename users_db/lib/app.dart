@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
                   return UserPage(
                     user: args.user,
                     updateUser: args.updateUser,
+                    creditCardNumb: args.creditCardNumb,
                   );
                 },
               );

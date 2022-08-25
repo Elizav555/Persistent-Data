@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:users_db/secure/secure_storage.dart';
 
 import '../db/database.dart';
 import '../widgets/custom_text_field.dart';
@@ -23,7 +24,6 @@ class AddUserPage extends StatefulWidget {
 }
 
 class _AddUserPageState extends State<AddUserPage> {
-  //CreditCard? creditCard;
   bool isLoading = false;
 
   final _lastNameFieldController = TextEditingController();
@@ -31,8 +31,8 @@ class _AddUserPageState extends State<AddUserPage> {
   final _ageFieldController = TextEditingController();
   final _phoneFieldController = TextEditingController();
   final _avatarFieldController = TextEditingController();
+  final _creditCardNumberFieldController = TextEditingController();
 
-  // final _creditCardNumberFieldController = TextEditingController();
   @override
   void initState() {
     if (widget.user != null) {
@@ -41,7 +41,8 @@ class _AddUserPageState extends State<AddUserPage> {
       _ageFieldController.text = widget.user!.age.toString();
       _phoneFieldController.text = widget.user!.phoneNumber;
       _avatarFieldController.text = widget.user!.avatar;
-      // _creditCardNumberFieldController.text = widget.user!.creditCard;
+      SecureStorage.getCardNumber(widget.user!.id)
+          .then((value) => _creditCardNumberFieldController.text = value ?? '');
     }
     super.initState();
   }
@@ -86,10 +87,10 @@ class _AddUserPageState extends State<AddUserPage> {
               controller: _avatarFieldController,
               label: "Avatar link",
             ),
-            // CustomTextField(
-            //   controller: _creditCardNumberFieldController,
-            //   label: "Credit card number",
-            // ),
+            CustomTextField(
+              controller: _creditCardNumberFieldController,
+              label: "Credit card number",
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Align(
@@ -129,8 +130,7 @@ class _AddUserPageState extends State<AddUserPage> {
     String age = _ageFieldController.text;
     String phoneNumber = _phoneFieldController.text;
     String avatar = _avatarFieldController.text;
-
-    //String creditCardNumber = _creditCardNumberFieldController.text;
+    String creditCardNumber = _creditCardNumberFieldController.text;
     if (widget.addUser != null) {
       final id = await widget.addUser!(
         UsersCompanion.insert(
@@ -141,6 +141,7 @@ class _AddUserPageState extends State<AddUserPage> {
           avatar: avatar,
         ),
       );
+      await SecureStorage.saveCardNumber(id, creditCardNumber);
     } else if (widget.updateUser != null && widget.user != null) {
       await widget.updateUser!(
         User(
@@ -152,14 +153,7 @@ class _AddUserPageState extends State<AddUserPage> {
           id: widget.user!.id,
         ),
       );
+      await SecureStorage.saveCardNumber(widget.user!.id, creditCardNumber);
     }
-    // await SecureStorage.saveCard(
-    //   id,
-    //   CreditCard(
-    //     number: creditCardNumber,
-    //     dueTo: dueTo,
-    //     cvv: int.parse(cvv),
-    //   ),
-    // );
   }
 }

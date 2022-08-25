@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:users_db/pages/add_user_page.dart';
 import 'package:users_db/pages/user_page.dart';
+import 'package:users_db/secure/secure_storage.dart';
 
 import '../db/database.dart';
 import '../utils/routes.dart';
@@ -63,9 +64,12 @@ class _HomePageState extends State<HomePage> {
                       foregroundImage: NetworkImage(
                     user.avatar,
                   )),
-                  onTap: () {
+                  onTap: () async {
+                    final creditCardNumb =
+                        await SecureStorage.getCardNumber(user.id);
                     Navigator.of(context).pushNamed(Routes.user,
-                        arguments: UserArguments(user, _updateUser));
+                        arguments: UserArguments(
+                            user, _updateUser, creditCardNumb ?? ''));
                   },
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
@@ -87,7 +91,7 @@ class _HomePageState extends State<HomePage> {
         },
         tooltip: 'Add User',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
